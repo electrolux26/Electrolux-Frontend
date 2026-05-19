@@ -5,7 +5,7 @@
  */
 
 import React from 'react';
-import { Table, Space, Tooltip } from 'antd';
+import { Table } from 'antd';
 import { Invoice } from '../models/invoice.model';
 import { StatusBadge } from './StatusBadge';
 
@@ -33,34 +33,34 @@ export const InvoiceTable: React.FC<InvoiceTableProps> = ({
         },
         {
           title: 'Vendor Name',
-          dataIndex: 'vendorName',
           key: 'vendorName',
           width: 220,
-          sorter: (a, b) => a.vendorName.localeCompare(b.vendorName),
-        },
-        {
-          title: 'Invoice Date',
-          dataIndex: 'invoiceDate',
-          key: 'invoiceDate',
-          width: 130,
           sorter: (a, b) =>
-            new Date(a.invoiceDate).getTime() -
-            new Date(b.invoiceDate).getTime(),
-          render: (date: string) => new Date(date).toLocaleDateString(),
+            a.vendorData.vendorName.localeCompare(b.vendorData.vendorName),
+          render: (_, record) => record.vendorData.vendorName,
         },
         {
-          title: 'Total Amount',
-          dataIndex: 'totalAmount',
-          key: 'totalAmount',
+          title: 'Document Date',
+          key: 'documentDate',
+          width: 140,
+          sorter: (a, b) =>
+            new Date(a.invoiceData.documentDate).getTime() -
+            new Date(b.invoiceData.documentDate).getTime(),
+          render: (_, record) =>
+            new Date(record.invoiceData.documentDate).toLocaleDateString(),
+        },
+        {
+          title: 'Gross Amount',
+          key: 'grossAmount',
           width: 140,
           align: 'right' as const,
-          sorter: (a, b) => a.totalAmount - b.totalAmount,
-          render: (amount: number) => (
+          sorter: (a, b) => a.invoiceData.grossAmount - b.invoiceData.grossAmount,
+          render: (_, record) => (
             <span className="font-semibold text-gray-800">
               {new Intl.NumberFormat('en-US', {
                 style: 'currency',
-                currency: 'USD',
-              }).format(amount)}
+                currency: 'EUR',
+              }).format(record.invoiceData.grossAmount)}
             </span>
           ),
         },
@@ -70,45 +70,12 @@ export const InvoiceTable: React.FC<InvoiceTableProps> = ({
           key: 'status',
           width: 130,
           filters: [
-            { text: 'New', value: 'NEW' },
-            { text: 'HITL Required', value: 'HITL_REQUIRED' },
-            { text: 'Approved', value: 'APPROVED' },
+            { text: 'Pending', value: 'PENDING' },
+            { text: 'Not Sure', value: 'NOT_SURE' },
+            { text: 'Done', value: 'DONE' },
           ],
           onFilter: (value, record) => record.status === value,
           render: (status) => <StatusBadge status={status} />,
-        },
-        {
-          title: 'Confidence Score',
-          dataIndex: 'confidenceScore',
-          key: 'confidenceScore',
-          width: 150,
-          align: 'center' as const,
-          sorter: (a, b) => a.confidenceScore - b.confidenceScore,
-          render: (score: number) => {
-            let color = 'text-green-600';
-            if (score < 70) color = 'text-red-600';
-            else if (score < 85) color = 'text-yellow-600';
-
-            return (
-              <Tooltip title={`AI Confidence: ${score}%`}>
-                <Space className={color}>
-                  <span className="font-semibold">{score}%</span>
-                  <div className="w-16 h-2 bg-gray-200 rounded-full overflow-hidden">
-                    <div
-                      className={`h-full ${
-                        score >= 85
-                          ? 'bg-green-500'
-                          : score >= 70
-                            ? 'bg-yellow-500'
-                            : 'bg-red-500'
-                      }`}
-                      style={{ width: `${score}%` }}
-                    ></div>
-                  </div>
-                </Space>
-              </Tooltip>
-            );
-          },
         },
       ]}
       dataSource={invoices}

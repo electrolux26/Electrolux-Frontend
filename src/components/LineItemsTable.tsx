@@ -1,89 +1,115 @@
-/**
- * Line Items Table Component
- * Displays invoice line items in a reusable Ant Design Table
- * Used in Invoice Detail page
- */
-
 import React from 'react';
-import { Table, Empty, Badge } from 'antd';
-import { LineItem } from '../models/invoice.model';
+import { Table, Empty } from 'antd';
+import { LineItem, MissingField } from '../models/invoice.model';
+import MissingFieldInput, { renderVerifiedField } from './MissingFieldInput';
 
 interface LineItemsTableProps {
   lineItems: LineItem[];
+  missingFields?: Record<string, MissingField>;
+  onFieldChange?: (fieldKey: string, value: string) => void;
   loading?: boolean;
-  confidenceScore?: number;
 }
 
-export const LineItemsTable: React.FC<LineItemsTableProps> = ({
+const LineItemsTable: React.FC<LineItemsTableProps> = ({
   lineItems,
+  missingFields = {},
+  onFieldChange,
   loading = false,
-  confidenceScore = 100,
 }) => {
-  const isLowConfidence = confidenceScore < 70;
-
   if (!lineItems || lineItems.length === 0) {
     return <Empty description="No line items" />;
   }
 
-  return (
-    <div className={isLowConfidence ? 'border-l-4 border-yellow-400 pl-4' : ''}>
-      {isLowConfidence && (
-        <div className="mb-4 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
-          <Badge status="warning" text="Low Confidence Score - Manual review recommended" />
-        </div>
-      )}
+  const renderEditableCell = (
+    index: number,
+    fieldKey: string,
+    value: React.ReactNode
+  ) => {
+    const key = `lineItems[${index}].${fieldKey}`;
+    const field = missingFields[key];
 
+    if (field) {
+      return (
+        <MissingFieldInput
+          fieldKey={key}
+          field={field}
+          onChange={(changedKey, changedValue) => onFieldChange?.(changedKey, changedValue)}
+        />
+      );
+    }
+
+    return renderVerifiedField(value);
+  };
+
+  return (
+    <div>
       <Table<LineItem>
         columns={[
           {
-            title: 'Description',
-            dataIndex: 'description',
-            key: 'description',
-            width: '40%',
-            render: (text: string) => <span className="font-medium">{text}</span>,
+            title: 'Line Item',
+            dataIndex: 'shortText',
+            key: 'shortText',
+            width: '30%',
+            render: (text: string, _record: LineItem, index: number) =>
+              renderEditableCell(index, 'shortText', <span className="font-medium">{text}</span>),
           },
           {
             title: 'GL Account',
             dataIndex: 'glAccount',
             key: 'glAccount',
             width: '15%',
-            render: (account: string) => (
-              <code className="bg-gray-100 px-2 py-1 rounded text-sm">{account}</code>
-            ),
+            render: (account: string, _record: LineItem, index: number) =>
+              renderEditableCell(
+                index,
+                'glAccount',
+                <code className="bg-gray-100 px-2 py-1 rounded text-sm">{account}</code>
+              ),
+          },
+          {
+            title: 'Debit/Credit',
+            dataIndex: 'debitCreditIndicator',
+            key: 'debitCreditIndicator',
+            width: '12%',
+            render: (value: string, _record: LineItem, index: number) =>
+              renderEditableCell(index, 'debitCreditIndicator', value),
+          },
+          {
+            title: 'Tax Code',
+            dataIndex: 'taxCode',
+            key: 'taxCode',
+            width: '12%',
+            render: (value: string, _record: LineItem, index: number) =>
+              renderEditableCell(index, 'taxCode', value),
           },
           {
             title: 'Cost Center',
             dataIndex: 'costCenter',
             key: 'costCenter',
-            width: '20%',
-            render: (center: string) => (
-              <code className="bg-gray-100 px-2 py-1 rounded text-sm">{center}</code>
-            ),
+            width: '12%',
+            render: (center: string, _record: LineItem, index: number) =>
+              renderEditableCell(
+                index,
+                'costCenter',
+                <code className="bg-gray-100 px-2 py-1 rounded text-sm">{center}</code>
+              ),
           },
           {
             title: 'Amount',
             dataIndex: 'amount',
             key: 'amount',
-            width: '15%',
+            width: '14%',
             align: 'right' as const,
-            render: (amount: number) => (
-              <span className="font-semibold text-gray-800">
-                {new Intl.NumberFormat('en-US', {
-                  style: 'currency',
-                  currency: 'USD',
-                }).format(amount)}
-              </span>
-            ),
-          },
-          {
-            title: '',
-            key: 'actions',
-            width: '10%',
-            render: () => (
-              <span className="text-gray-400 text-xs">
-                {isLowConfidence && '⚠️'}
-              </span>
-            ),
+            render: (amount: number, _record: LineItem, index: number) =>
+              renderEditableCell(
+                index,
+                'amount',
+                <span className="font-semibold text-gray-800">
+                  {new Intl.NumberFormat('en-US', {
+                    style: 'currency',
+                    currency: 'EUR',
+                  }).format(amount)}
+                </span>
+              ),
           },
         ]}
         dataSource={lineItems}
@@ -98,7 +124,7 @@ export const LineItemsTable: React.FC<LineItemsTableProps> = ({
               Total:{' '}
               {new Intl.NumberFormat('en-US', {
                 style: 'currency',
-                currency: 'USD',
+                currency: 'EUR',
               }).format(
                 currentData.reduce((sum, item) => sum + item.amount, 0)
               )}

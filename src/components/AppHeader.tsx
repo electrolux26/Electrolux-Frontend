@@ -5,7 +5,7 @@
  */
 
 import React from 'react';
-import { Layout, Button, Dropdown, Avatar, Space } from 'antd';
+import { Layout, Dropdown, Avatar } from 'antd';
 import { Link, useNavigate } from 'react-router-dom';
 import { LogOut } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
@@ -41,37 +41,33 @@ const AppHeader: React.FC = () => {
 
   return (
     <Layout.Header className="bg-white shadow-md border-b border-gray-200">
-      <div className="flex items-center justify-between h-full px-6 max-w-screen-2xl mx-auto">
+      <div className="flex items-center justify-between h-14 px-4 sm:px-6 max-w-screen-2xl mx-auto">
         {/* Logo / Brand */}
         <Link to="/invoices" className="flex items-center gap-3 no-underline">
-          <div className="w-8 h-8 bg-gradient-to-br from-blue-600 to-blue-500 rounded-lg flex items-center justify-center text-white font-bold text-lg">
+          <div className="w-9 h-9 bg-gradient-to-br from-blue-600 to-blue-500 rounded-xl flex items-center justify-center text-white font-semibold text-lg">
             📋
           </div>
-          <h1 className="text-xl font-bold text-gray-800 m-0">
-            Invoice Processing
-          </h1>
+          <div className="hidden sm:flex flex-col leading-tight">
+            <span className="text-sm font-semibold text-slate-900">Invoice Processing</span>
+            <span className="text-xs text-slate-500">Work Queue</span>
+          </div>
         </Link>
 
         {/* Navigation / User Section */}
-        <div className="flex items-center gap-6">
-          <nav className="flex gap-6">
-            <Link
-              to="/invoices"
-              className="text-gray-700 hover:text-blue-600 font-medium transition-colors no-underline"
-            >
-              Work Queue
-            </Link>
-          </nav>
+        <div className="flex items-center gap-4">
+          <Link
+            to="/invoices"
+            className="text-sm text-slate-700 hover:text-blue-600 font-medium transition-colors no-underline"
+          >
+            Queue
+          </Link>
 
-          {/* User Account Section */}
           {user && (
             <Dropdown menu={{ items: userMenuItems }} trigger={['click']}>
-              <div className="flex items-center gap-3 cursor-pointer hover:bg-gray-50 px-3 py-2 rounded-lg transition-colors">
+              <div className="flex items-center gap-2 cursor-pointer hover:bg-slate-50 px-2 py-1 rounded-xl transition-colors">
                 <Avatar
-                  size="small"
-                  style={{
-                    backgroundColor: '#1890ff',
-                  }}
+                  size={32}
+                  style={{ backgroundColor: '#1890ff' }}
                 >
                   {user.displayName
                     .split(' ')
@@ -79,21 +75,12 @@ const AppHeader: React.FC = () => {
                     .join('')
                     .toUpperCase()}
                 </Avatar>
-                <div className="text-right hidden sm:block">
-                  <div className="text-sm font-medium text-gray-900">
-                    {user.displayName}
-                  </div>
-                  <div className="text-xs text-gray-500">{user.email}</div>
+                <div className="hidden md:block text-sm leading-tight">
+                  <div className="font-medium text-slate-900">{user.displayName}</div>
                 </div>
               </div>
             </Dropdown>
           )}
-
-          {/* Status Indicator */}
-          <div className="flex items-center gap-2 text-sm text-gray-600">
-            <div className="w-2 h-2 rounded-full bg-green-500"></div>
-            System Ready
-          </div>
         </div>
       </div>
     </Layout.Header>

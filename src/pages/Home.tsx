@@ -9,7 +9,7 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Layout, Button, Space, message } from 'antd';
 import { RefreshCw } from 'lucide-react';
-import { Invoice } from '../models/invoice.model';
+import { Invoice, InvoiceStatus } from '../models/invoice.model';
 import { invoiceApi } from '../api/invoiceApi';
 import InvoiceTable from '../components/InvoiceTable';
 
@@ -83,23 +83,23 @@ const Home: React.FC = () => {
           </div>
 
           <div className="bg-white p-4 rounded-lg border border-gray-200 shadow-sm">
-            <div className="text-sm text-gray-600 mb-1">New</div>
+            <div className="text-sm text-gray-600 mb-1">Pending</div>
             <div className="text-2xl font-bold text-blue-600">
-              {invoices.filter((i) => i.status === 'NEW').length}
+              {invoices.filter((i) => i.status === InvoiceStatus.PENDING).length}
             </div>
           </div>
 
           <div className="bg-white p-4 rounded-lg border border-gray-200 shadow-sm">
-            <div className="text-sm text-gray-600 mb-1">HITL Required</div>
+            <div className="text-sm text-gray-600 mb-1">Not Sure</div>
             <div className="text-2xl font-bold text-orange-600">
-              {invoices.filter((i) => i.status === 'HITL_REQUIRED').length}
+              {invoices.filter((i) => i.status === InvoiceStatus.NOT_SURE).length}
             </div>
           </div>
 
           <div className="bg-white p-4 rounded-lg border border-gray-200 shadow-sm">
-            <div className="text-sm text-gray-600 mb-1">Approved</div>
+            <div className="text-sm text-gray-600 mb-1">Done</div>
             <div className="text-2xl font-bold text-green-600">
-              {invoices.filter((i) => i.status === 'APPROVED').length}
+              {invoices.filter((i) => i.status === InvoiceStatus.DONE).length}
             </div>
           </div>
         </div>

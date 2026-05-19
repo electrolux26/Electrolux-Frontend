@@ -17,12 +17,12 @@ interface StatusBadgeProps {
  */
 const getStatusColor = (status: InvoiceStatus): string => {
   switch (status) {
-    case InvoiceStatus.APPROVED:
+    case InvoiceStatus.DONE:
       return 'success';
-    case InvoiceStatus.HITL_REQUIRED:
+    case InvoiceStatus.NOT_SURE:
       return 'warning';
-    case InvoiceStatus.NEW:
-      return 'default';
+    case InvoiceStatus.PENDING:
+      return 'error';
     default:
       return 'default';
   }
@@ -33,12 +33,12 @@ const getStatusColor = (status: InvoiceStatus): string => {
  */
 const getStatusLabel = (status: InvoiceStatus): string => {
   switch (status) {
-    case InvoiceStatus.APPROVED:
-      return 'Approved';
-    case InvoiceStatus.HITL_REQUIRED:
-      return 'HITL Required';
-    case InvoiceStatus.NEW:
-      return 'New';
+    case InvoiceStatus.DONE:
+      return 'Done';
+    case InvoiceStatus.NOT_SURE:
+      return 'Not Sure';
+    case InvoiceStatus.PENDING:
+      return 'Pending';
     default:
       return status;
   }
